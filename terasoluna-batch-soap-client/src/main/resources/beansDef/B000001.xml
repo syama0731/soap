@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- アノテーションによる設定 -->
+    <context:annotation-config/>
+
+    <!-- 共通コンテキスト(フレームワークの共通機能を使う場合、かならずインポートすること。)  -->
+    <import  resource="classpath:beansDef/commonContext.xml" />
+
+    <!-- データソース設定  -->
+    <import  resource="classpath:beansDef/dataSource.xml" />
+
+    <!-- コンポーネントスキャン設定 -->
+    <context:component-scan base-package="jp.co.terasoluna.batch.sample.b000001"/>
+    
+    <bean id="marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="packagesToScan" value="jp.co.terasoluna"/>
+        <property name="schemas">
+            <list>
+                <value>classpath:xsd/item.xsd</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
+        <property name="marshaller" ref="marshaller"/>
+        <property name="unmarshaller" ref="marshaller"/>
+        <property name="defaultUri" value="http://localhost:8080/ws"/>
+        <property name="messageSender">
+            <bean class="org.springframework.ws.transport.http.HttpComponentsMessageSender">
+                <property name="readTimeout" value="20000"/> <!-- 20s -->
+            </bean>
+        </property>
+    </bean>
+
+</beans>
